@@ -53,11 +53,11 @@ module WorkerApp
                 puts "Back Blue"
               end
 
-              if message.body[0] == 'C'
+              if message.body[0] == 'F'
                 image.combine_options do |img|
-                  img.contrast
+                  img.flip
                 end
-                puts "Contrast"
+                puts "Fliped"
               end
 
               s3 = Aws::S3::Resource.new(region: 'us-west-2')
