@@ -41,6 +41,7 @@ module WorkerApp
               if message.body[0] == 'R'
                 image.combine_options do |img|
                   img.rotate "-45"
+                  img.resize "300x300>"
                 end
                 puts "Rotation"
               end
