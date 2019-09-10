@@ -24,13 +24,13 @@ module WorkerApp
         poller = Aws::SQS::QueuePoller.new(receive_queue_url)
 
         poller_stats = poller.poll({
-                                       max_number_of_messages: 2,
-                                       idle_timeout: 10 # Stop polling after 60 seconds of no more messages available (polls indefinitely by default).
+                                       max_number_of_messages: 10,
+                                       idle_timeout: 10
                                    }) do |messages|
           messages.each do |message|
             puts "Message body: #{message.body}"
 
-              photo_key = message.body[2..].to_s
+              photo_key = message.body[4..].to_s
               s3 = Aws::S3::Client.new(region: 'us-west-2')
               @temp_file_location = "./tmp/#{photo_key}.png"
               resp = s3.get_object(bucket:'awsprojectbuckett', key:photo_key)
@@ -38,7 +38,7 @@ module WorkerApp
 
               image = MiniMagick::Image.new(@temp_file_location)
 
-              if message.body[0] == 'R'
+              if message.body[2] == 'R'
                 image.combine_options do |img|
                   img.rotate "-45"
                   img.resize "300x300>"
@@ -46,16 +46,17 @@ module WorkerApp
                 puts "Rotation"
               end
 
-              if message.body[0] == 'B'
+              if message.body[2] == 'B'
                 image.combine_options do |img|
                   img.background "blue"
                 end
                 puts "Back Blue"
               end
 
-              if message.body[0] == 'F'
+              if message.body[2] == 'F'
                 image.combine_options do |img|
                   img.flip
+                  img.resize "300x300>"
                 end
                 puts "Fliped"
               end
