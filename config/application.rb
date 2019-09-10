@@ -55,9 +55,9 @@ module WorkerApp
 
               if message.body[0] == 'C'
                 image.combine_options do |img|
-                  img.background "red"
+                  img.contrast
                 end
-                puts "Back Red"
+                puts "Contrast"
               end
 
               s3 = Aws::S3::Resource.new(region: 'us-west-2')
