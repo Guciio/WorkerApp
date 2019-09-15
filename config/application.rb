@@ -30,11 +30,12 @@ module WorkerApp
           messages.each do |message|
             puts "Message body: #{message.body}"
 
-              photo_key = message.body[4..].to_s
+
+              photo_key = File.basename(message.body[4..].to_s)
               s3 = Aws::S3::Client.new(region: 'us-west-2')
-              @temp_file_location = "./tmp/#{photo_key}.png"
-              resp = s3.get_object(bucket:'awsprojectbuckett', key:photo_key)
-              File.open(@temp_file_location, 'wb') { |file| file.write(resp.body.read) }
+              @temp_file_location = "./tmp/#{photo_key}"
+              resp = s3.get_object(bucket:'awsprojectbuckett', key:message.body[4..].to_s)
+              File.open(@temp_file_location, 'w+') { |file| file.write(resp.body.read) }
 
               image = MiniMagick::Image.new(@temp_file_location)
 
@@ -62,7 +63,7 @@ module WorkerApp
               end
 
               s3 = Aws::S3::Resource.new(region: 'us-west-2')
-              obj = s3.bucket('awsprojectbuckett').object(photo_key)
+              obj = s3.bucket('awsprojectbuckett').object(message.body[4..].to_s)
               obj.upload_file(@temp_file_location, acl: 'public-read')
 
               puts "Photo saved"
